@@ -1,0 +1,73 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        width: 320px;
+        padding: 12px;
+      }
+      button {
+        width: 100%;
+        padding: 10px;
+        margin: 6px 0;
+        cursor: pointer;
+      }
+      .row {
+        display: flex;
+        gap: 8px;
+      }
+      .row button {
+        width: 50%;
+      }
+      .status {
+        font-size: 12px;
+        opacity: 0.8;
+        margin: 8px 0;
+      }
+      .list {
+        margin-top: 10px;
+      }
+      .item {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px;
+        border: 1px solid #eee;
+        border-radius: 10px;
+        margin-bottom: 8px;
+      }
+      .mono {
+        font-variant-numeric: tabular-nums;
+        font-family:
+          ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+          "Liberation Mono", "Courier New", monospace;
+      }
+      .muted {
+        opacity: 0.7;
+        font-size: 12px;
+      }
+      a {
+        color: inherit;
+      }
+    </style>
+  </head>
+  <body>
+    <h3 style="margin: 0 0 10px 0">YT Votes</h3>
+
+    <div class="row">
+      <button id="loginBtn">Sign in</button>
+      <button id="logoutBtn">Logout</button>
+    </div>
+
+    <div class="status" id="status"></div>
+
+    <button id="refreshBtn">Refresh Top Moments</button>
+
+    <div class="muted" id="videoInfo"></div>
+
+    <div class="list" id="topList"></div>
+
+    <script src="popup.js"></script>
+  </body>
+</html>
