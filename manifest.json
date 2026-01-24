@@ -5,7 +5,7 @@
   "description": "Upvote/downvote moments in YouTube videos with timestamps.",
   "permissions": ["identity", "storage", "tabs", "scripting"],
   "oauth2": {
-    "client_id": "386970440507-fat9s4u2leq29554ttv98t8ctjsil27b.apps.googleusercontent.com",
+    "client_id": "YOUR_API_KEY.apps.googleusercontent.com",
     "scopes": [
       "openid",
       "https://www.googleapis.com/auth/userinfo.email",
