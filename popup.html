@@ -2,71 +2,409 @@
 <html>
   <head>
     <meta charset="utf-8" />
+    <meta name="color-scheme" content="dark light" />
     <style>
+      :root {
+        --bg: #0b1220;
+        --card: #0f1a2e;
+        --card2: #101f3a;
+        --border: #1e2b47;
+        --text: #e6edf7;
+        --muted: rgba(230, 237, 247, 0.7);
+        --muted2: rgba(230, 237, 247, 0.55);
+        --accent: #6aa6ff;
+        --good: #44d19d;
+        --bad: #ff6b6b;
+        --warn: #ffd166;
+        --shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+        --radius: 14px;
+        --mono:
+          ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+          "Liberation Mono", "Courier New", monospace;
+        --sans:
+          ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica,
+          Arial;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
       body {
-        font-family: Arial, sans-serif;
-        width: 320px;
+        margin: 0;
+        width: 380px;
         padding: 12px;
+        font-family: var(--sans);
+        background:
+          radial-gradient(
+            900px 420px at 30% 0%,
+            rgba(106, 166, 255, 0.18),
+            transparent 55%
+          ),
+          var(--bg);
+        color: var(--text);
       }
-      button {
-        width: 100%;
-        padding: 10px;
-        margin: 6px 0;
-        cursor: pointer;
+
+      .header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 10px;
       }
+
+      .title {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+      .title h3 {
+        margin: 0;
+        font-size: 14px;
+        letter-spacing: 0.2px;
+      }
+      .title .sub {
+        font-size: 11px;
+        color: var(--muted);
+      }
+
+      .pill {
+        font-size: 11px;
+        padding: 6px 10px;
+        border-radius: 999px;
+        border: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.04);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        white-space: nowrap;
+      }
+      .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 999px;
+        background: var(--muted2);
+      }
+      .pill.good .dot {
+        background: var(--good);
+      }
+      .pill.bad .dot {
+        background: var(--bad);
+      }
+
       .row {
         display: flex;
         gap: 8px;
       }
-      .row button {
-        width: 50%;
-      }
-      .status {
+
+      button {
+        border: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.04);
+        color: var(--text);
+        border-radius: 12px;
+        padding: 10px 10px;
+        cursor: pointer;
         font-size: 12px;
-        opacity: 0.8;
-        margin: 8px 0;
+        transition:
+          transform 0.05s ease,
+          background 0.15s ease;
       }
-      .list {
-        margin-top: 10px;
+      button:hover {
+        background: rgba(255, 255, 255, 0.08);
       }
-      .item {
+      button:active {
+        transform: translateY(1px);
+      }
+      button.primary {
+        background: rgba(106, 166, 255, 0.16);
+        border-color: rgba(106, 166, 255, 0.35);
+      }
+      button.primary:hover {
+        background: rgba(106, 166, 255, 0.22);
+      }
+      button.danger {
+        background: rgba(255, 107, 107, 0.12);
+        border-color: rgba(255, 107, 107, 0.3);
+      }
+      button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      .card {
+        background: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.05),
+          rgba(255, 255, 255, 0.02)
+        );
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 12px;
+        box-shadow: var(--shadow);
+      }
+
+      .videoCard {
+        margin: 10px 0;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .kv {
         display: flex;
         justify-content: space-between;
-        padding: 8px;
-        border: 1px solid #eee;
-        border-radius: 10px;
-        margin-bottom: 8px;
+        gap: 10px;
+        font-size: 12px;
+      }
+      .kv .k {
+        color: var(--muted);
       }
       .mono {
+        font-family: var(--mono);
         font-variant-numeric: tabular-nums;
-        font-family:
-          ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
-          "Liberation Mono", "Courier New", monospace;
       }
-      .muted {
+
+      .controls {
+        margin: 10px 0;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+      }
+
+      .field {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 10px;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.03);
+      }
+      .field label {
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .field input,
+      .field select {
+        width: 90px;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+        padding: 6px 8px;
+        background: rgba(0, 0, 0, 0.25);
+        color: var(--text);
+        font-size: 12px;
+        outline: none;
+      }
+
+      .sectionTitle {
+        margin: 10px 0 8px 0;
+        font-size: 12px;
+        color: var(--muted);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-top: 8px;
+      }
+
+      details.moment {
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.03);
+        overflow: hidden;
+      }
+      details.moment > summary {
+        list-style: none;
+        cursor: pointer;
+        padding: 10px 12px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        user-select: none;
+      }
+      details.moment > summary::-webkit-details-marker {
+        display: none;
+      }
+
+      .momentLeft {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+      }
+      .momentRight {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .badge {
+        font-size: 11px;
+        padding: 4px 8px;
+        border-radius: 999px;
+        border: 1px solid var(--border);
+        background: rgba(0, 0, 0, 0.22);
+        font-family: var(--mono);
+      }
+      .badge.up {
+        border-color: rgba(68, 209, 157, 0.35);
+        background: rgba(68, 209, 157, 0.12);
+      }
+      .badge.down {
+        border-color: rgba(255, 107, 107, 0.35);
+        background: rgba(255, 107, 107, 0.1);
+      }
+      .chev {
         opacity: 0.7;
         font-size: 12px;
       }
-      a {
-        color: inherit;
+
+      .momentBody {
+        border-top: 1px solid var(--border);
+        padding: 10px 12px;
+        background: rgba(0, 0, 0, 0.18);
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .snippetBox {
+        border: 1px solid var(--border);
+        background: rgba(0, 0, 0, 0.25);
+        border-radius: 12px;
+        padding: 10px;
+        font-size: 12px;
+        line-height: 1.4;
+      }
+
+      .actions {
+        display: flex;
+        gap: 8px;
+      }
+      .actions a {
+        flex: 1;
+        text-decoration: none;
+      }
+      .actions a button {
+        width: 100%;
+      }
+
+      .muted {
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .footer {
+        margin-top: 10px;
+        display: flex;
+        justify-content: space-between;
+        gap: 8px;
+        align-items: center;
+        color: var(--muted2);
+        font-size: 11px;
+      }
+
+      .link {
+        color: var(--accent);
+        text-decoration: none;
+      }
+      .link:hover {
+        text-decoration: underline;
+      }
+
+      .errorBox {
+        margin-top: 10px;
+        border: 1px solid rgba(255, 107, 107, 0.35);
+        background: rgba(255, 107, 107, 0.1);
+        border-radius: 12px;
+        padding: 10px;
+        font-size: 12px;
+        display: none;
       }
     </style>
   </head>
-  <body>
-    <h3 style="margin: 0 0 10px 0">YT Votes</h3>
 
-    <div class="row">
-      <button id="loginBtn">Sign in</button>
-      <button id="logoutBtn">Logout</button>
+  <body>
+    <div class="header">
+      <div class="title">
+        <h3>YT Votes</h3>
+        <div class="sub">Vote moments • View transcript snippets</div>
+      </div>
+
+      <div class="pill" id="statusPill">
+        <span class="dot"></span>
+        <span id="statusText">Checking…</span>
+      </div>
     </div>
 
-    <div class="status" id="status"></div>
+    <div class="row">
+      <button id="loginBtn" class="primary">Sign in</button>
+      <button id="logoutBtn" class="danger">Logout</button>
+    </div>
 
-    <button id="refreshBtn">Refresh Top Moments</button>
+    <div class="card videoCard">
+      <!-- <div class="kv">
+        <div class="k">Active content</div>
+        <div class="mono" id="contentId">—</div>
+      </div> -->
+      <div class="kv">
+        <div class="k">Page</div>
+        <div class="mono" id="pageHost">—</div>
+      </div>
+      <div class="kv">
+        <div class="k">Transcript</div>
+        <div class="mono" id="transcriptStatus">—</div>
+      </div>
 
-    <div class="muted" id="videoInfo"></div>
+      <div class="row">
+        <button id="refreshBtn" class="primary" style="flex: 1">Refresh</button>
+        <!-- <a
+          id="openPageLink"
+          class="link"
+          href="#"
+          target="_blank"
+          style="align-self: center"
+        >
+          Open
+        </a> -->
+      </div>
+    </div>
 
-    <div class="list" id="topList"></div>
+    <div class="controls">
+      <div class="field">
+        <label for="windowSec">Snippet window</label>
+        <input id="windowSec" type="number" min="2" max="30" value="5" />
+      </div>
+
+      <div class="field">
+        <label for="autoLoadTranscript">Auto-load transcript</label>
+        <select id="autoLoadTranscript">
+          <option value="yes" selected>Yes</option>
+          <option value="no">No</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="sectionTitle">
+      <span>Top moments</span>
+      <span class="muted" id="metaHint">—</span>
+    </div>
+
+    <div class="list" id="momentsList"></div>
+
+    <div class="errorBox" id="errorBox"></div>
+
+    <div class="footer">
+      <span>Tip: expand a moment to see transcript around it.</span>
+      <a class="link" href="http://localhost:3000/dashboard" target="_blank"
+        >Dashboard</a
+      >
+    </div>
 
     <script src="popup.js"></script>
   </body>

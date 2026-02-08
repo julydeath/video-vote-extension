@@ -2,7 +2,7 @@
 // Content Script
 // - Overlay ▲/▼ on any HTML5 <video>
 // - Vote submit via service worker
-// - On YouTube: extract caption baseUrl and trigger transcript ingestion ONLY on vote
+// - On YouTube: sends caption baseUrl + metadata to SW ONLY on vote
 // - Provides GET_ACTIVE_CONTENT for popup
 // - Provides REQUEST_GOOGLE_TOKEN bridge for dashboard
 // =======================
@@ -83,7 +83,6 @@ async function sha256Hex(input) {
 }
 
 async function getContentId(videoEl) {
-  // YouTube stable id
   try {
     const u = new URL(location.href);
     if (u.hostname.includes("youtube.com")) {
@@ -158,7 +157,7 @@ function watchResizeScroll() {
 }
 
 // -----------------------
-// YouTube caption track extraction
+// YouTube caption track extraction (for metadata only)
 // -----------------------
 function extractJsonObjectAfter(text, marker) {
   const idx = text.indexOf(marker);
@@ -198,12 +197,14 @@ function getYouTubePlayerResponse() {
     } catch {}
   }
 
+  // last resort (can be stale on SPA nav, but OK for metadata)
   for (const s of document.scripts) {
     const t = s.textContent || "";
     if (!t.includes("ytInitialPlayerResponse")) continue;
     const obj = extractJsonObjectAfter(t, "ytInitialPlayerResponse");
     if (obj) return obj;
   }
+
   return null;
 }
 
@@ -246,8 +247,7 @@ async function ensureYouTubeTranscriptOnDemand() {
   if (ytAttemptedForVideo.has(contentId)) return;
   ytAttemptedForVideo.add(contentId);
 
-  // must be logged in
-  const auth = await sendToSW({ type: "AUTH_GET_TOKEN" });
+  const auth = await sendToSW({ type: "AUTH_PEEK" });
   if (!auth?.ok || !auth?.token) return;
 
   const pr = getYouTubePlayerResponse();
@@ -270,9 +270,9 @@ async function ensureYouTubeTranscriptOnDemand() {
 
   if (
     !res?.ok &&
-    (res?.debug?.status === 429 || `${res?.error || ""}`.includes("429"))
+    (res?.status === 429 || `${res?.error || ""}`.includes("429"))
   ) {
-    showToast("YouTube captions rate-limited (429). Try later.");
+    showToast("Transcript rate-limited. Try later.");
   }
 }
 
@@ -310,20 +310,19 @@ async function postVote(voteType) {
     return;
   }
 
-  // Only when user votes on YouTube do we attempt transcript (prevents spam)
+  // Only on YouTube: request transcript fetch+store
   ensureYouTubeTranscriptOnDemand();
 }
 
 // -----------------------
 // Popup support: GET_ACTIVE_CONTENT
-// Only respond from frames that contain <video>
 // -----------------------
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (msg?.type !== "GET_ACTIVE_CONTENT") return;
 
   (async () => {
     const video = getBestVideoElement();
-    if (!video) return; // don't respond from non-video frames
+    if (!video) return;
 
     const contentId = await getContentId(video);
     sendResponse({
@@ -344,11 +343,7 @@ window.addEventListener("message", (event) => {
   if (event.source !== window) return;
   if (event.data?.type !== "REQUEST_GOOGLE_TOKEN") return;
 
-  console.log("[EXT] Dashboard requested token");
-
-  chrome.runtime.sendMessage({ type: "AUTH_GET_TOKEN" }, (res) => {
-    console.log("[EXT] Token response from SW:", res);
-
+  chrome.runtime.sendMessage({ type: "AUTH_PEEK" }, (res) => {
     window.postMessage(
       {
         type: "GOOGLE_TOKEN_RESPONSE",
